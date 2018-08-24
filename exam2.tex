@@ -1,0 +1,85 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{enumitem}
+\DeclareMathOperator{\tr}{tr}
+
+\title{Statistical Estimation Theory Exam 2}
+\author{Shubhodeep Mukherji (sm46334)} \date{April 20, 2016}
+
+\begin{document}
+\maketitle
+
+\section*{Problem 1}
+
+We begin with the state-propogation equation
+\begin{equation*}
+\textbf{x}_i = \Phi (t_i, t_k) \textbf{x}_k
+\end{equation*}
+and the observation state equation
+\begin{equation*}
+\textbf{y}_i = \tilde{H}_i \textbf{x}_i + \epsilon_i, \quad i=1,\dots,l.
+\end{equation*}
+The observation equation can also be written in the form
+\begin{equation*}
+\textbf{y} = H \textbf{x}_k + \mathbf{\epsilon}
+\end{equation*}
+where the errors are unbiased, i.e. $E[\mathbf{\epsilon}]=\textbf{0}$ and the covariance matrix, $E[\mathbf{\epsilon} \mathbf{\epsilon}^T ]$ is the positive definite matrix $R$.  In order to determine the best linear, unbiased, minimum variance estimate, we must make for following considerations:
+\begin{itemize}
+\item \textit{Linear:} The first requirement is that the estimate must be composed of the linear combination of the observations.  Suppose $M$ is an $(n \times m)$ matrix which will be specified later.  Then, we let the estimate be
+\begin{equation*}
+\hat{\textbf{x}}_k = M \textbf{y}.
+\end{equation*}
+
+\item \textit{Unbiased:} The estimate begin unbiased means that $E [\hat{\mathbf{x}} ] = \textbf{x}$.  So, we have
+\begin{equation*}
+E[\hat{\textbf{x}}_k] = E[M\textbf{y}] = E[MH\textbf{x}_k + M \mathbf{\epsilon} ] = \textbf{x}_k.
+\end{equation*}
+However, since $E[\mathbf{\epsilon}]=0$, the above simplifies to
+\[MH \textbf{x}_k = \textbf{x}_k, \]
+yielding the constraint $MH=I$.
+
+\item \textit{Minimum Variance:} If the estimate is unbiased, then the estimation error covariance matrix is
+\[P_k = E \left[ ( \hat{\mathbf{x}}_k - \mathbf{x}_k )( \hat{\mathbf{x}}_k - \mathbf{x}_k )^T  \right] \]
+\end{itemize}
+
+In order to obtain the minimum variance, we must minimize $P_k$ while satisfying $E [\hat{\mathbf{x}} ] = \textbf{x}$ and $MH=I$.  We begin by making the appropriate substitutions and obtaining
+\begin{eqnarray*}
+P_k &=& E \left[ ( \hat{\mathbf{x}}_k - \mathbf{x}_k )( \hat{\mathbf{x}}_k - \mathbf{x}_k )^T  \right]\\
+&=& E[(M\mathbf{y}- \mathbf{x}_k)(M\mathbf{y} - \mathbf{x}_k)^T]\\
+&=& E[(M(H\mathbf{x}_k + \mathbf{\epsilon}) - \mathbf{x}_k)(M(H\mathbf{x}_k + \mathbf{\epsilon}) - \mathbf{x}_k)^T]\\
+&=& E[M \mathbf{\epsilon} \mathbf{\epsilon}^T M^T]\\
+&=&  MRM^T
+\end{eqnarray*}
+In order to involve the constraint $MH=I$, we define the $(n \times n)$ matrix $\Lambda$ of unspecified Lagrange multipliers and augment the above equation to form
+\[ P_k = MRM^T + \Lambda^T (I-MH)^T + (I-MH)\Lambda.\]
+In order to minimize $P_k$, we need the first variation with respect to $M$ to be 0 and $I-MH=0$.  Hence,
+\[\delta P_k = 0 = (MR - \Lambda^T H^T)\delta M^T + \delta M (RM^T - H\Lambda).\]
+For $\delta P_k$ to go to zero for an arbitrariy $\delta M$, we need either $RM^T - H\Lambda$ = 0 or $\delta M$ and/or $RM^T - H\Lambda$ to not be full rank.   
+
+Imposing the first condition yields a minimum value of $P$.  So, we need
+\[MR-\Lambda^T H^T = 0, \qquad I-MH=0.\]
+The first equation yields $M=\Lambda^T H^T R^{-1}$ since $R$ is assumed to be positive definite and substituting it into the second equation leads to
+\[\Lambda^T \left( H^T R^{-1} H \right) = I.\]
+Now, if $m \geq n$, we have $(\Lambda^T = \left( H^T R^{-1} H \right)^{-1},$ resulting in
+\[ M = \left( H^TR^{-1}H \right)^{-1}H^TR^{-1}. \]
+Then, the covariance matrix becomes
+\[P_k = \left( H^T R^{-1} H \right)^{-1}. \]
+The resulting Linear Unbiased Minimum Variance Estimator then takes the form
+\[ \hat{\mathbf{x}}_k = M\mathbf{y} = (H^TR^{-1}H)^{-1}H^TR^{-1}\mathbf{y} \]
+
+
+\newpage
+
+\section*{Problem 4}
+
+If there is a slowly time-varying leak in the propellant tank causing unmodelled accelerations on the satellite, then a filter can be implemented to improve the estimation using either State Noice Compensation (SNC) or Dynamic Model Compensation (DMC).  The first method, SNC, characterizes the perturbing acceleration as white noise, which is a stationary Gaussian process with mean zero and variance defined as $\sigma^2_u \delta (t-\tau)$.  The parameter $\sigma_u$ can be tuned to optimize the estimation performance.  This method can be useful if the dynamics can't be parameterized and modeled, in which case it is treated as noise.
+
+On the other hand, DMC requires the assumption that the unknown acceleration can be characterized as a first-order linear stochastic differential equation.  Unlike SNC, this process noise model results in a deterministic and purely random acceleration terms.  The deterministic acceleration can be added to the state vector and estimated, which results in an improvement to the filter dynamic model.  The velocity errors from DMC behave similarly to the errors from SNC and although the position error RMS performance for an optimally tuned SNC filter approaches the performance of a DMC filter, it requires fine tuning.  In our case, the true state values for the acceleration are not available to guide the tuning effort, so the price optimal values for the tuning paramater aren't known.  Since DMC can achieve good performance over a broader, suboptimal range of values for $\sigma_u$ than SNC, applying DMC in this problem would be advantageous.  Furthermore, since the deterministic acceleration terms are augmented to the state vectore, the filter dynamic model can also be improved.
+
+\end{document}
